@@ -6,13 +6,19 @@ const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const flash = require("connect-flash");
-const catchAsync = require("./utilities/catchAsync");
+// const catchAsync = require("./utilities/catchAsync");
 const ExpressError = require("./utilities/ExpressError");
-const {campgroundValidatingSchema, reviewValidatingSchema} = require("./joi-schemas");
-const Campground = require("./models/campground");
-const Review = require("./models/review");
-const campground = require("./routes/campgrounds");
-const review = require("./routes/reviews");
+// const {campgroundValidatingSchema, reviewValidatingSchema} = require("./joi-schemas");
+// const Campground = require("./models/campground");
+// const Review = require("./models/review");
+
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user");
+
+const campgroundRoutes = require("./routes/campgrounds");
+const reviewRoutes = require("./routes/reviews");
+const userRoutes = require("./routes/users");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
     useNewUrlParser: true, 
@@ -48,18 +54,33 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 })
 
-app.use("/campgrounds", campground);
-app.use("/campgrounds/:id/reviews", review);
+app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/reviews", reviewRoutes);
+app.use("/", userRoutes);
 
 app.get("/", (req, res) => {
     res.render("home");
 });
+
+app.get("/fakeUser", async (req, res) => {
+    const user = new User({email: "meow@gmail.com", username: "meowMeow"});
+    const newUser = await User.register(user, "chicken");
+    res.send(newUser);
+})
 
 app.all("*", (req, res, next) => {
     next(new ExpressError("Page not found", 404))
