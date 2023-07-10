@@ -8,7 +8,8 @@ const campgroundSchema = new Schema({
     price: Number,
     description: String,
     location: String,
-    reviews: [{type: Schema.Types.ObjectId, ref: "Review"}]
+    reviews: [{type: Schema.Types.ObjectId, ref: "Review"}],
+    author: {type:Schema.Types.ObjectId, ref: "User"}
 });
 
 campgroundSchema.post("findOneAndDelete", async function(campground) {
