@@ -5,9 +5,10 @@ module.exports.campgroundValidatingSchema = Joi.object({
         title: Joi.string().required(),
         location: Joi.string().required(),
         price: Joi.number().min(0).required(),
-        // image: Joi.string().required(),
+        // image: Joi.array().required(),
         description: Joi.string().required()  
-    }).required()
+    }).required(),
+    deleteImages: Joi.array()
 })
 
 module.exports.reviewValidatingSchema = Joi.object({
