@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/starability-basic.css" />
 <div class="row">
   <div class="col-6">
+    <div id='map' style='width: 400px; height: 300px;'></div>
     <!-- <img class="card-img-top" src="<%#=campground.image%>" alt="Card image cap" /> -->
     <div id="campgroundCarousel" class="carousel slide">
       <div class="carousel-inner">
@@ -92,3 +93,9 @@
     <% } %>
   </div>
 </div>
+
+<script>
+  const mapToken = '<%=process.env.MAPBOX_TOKEN%>';
+  const campground = <%-JSON.stringify(campground)%>;
+</script>
+<script src="/js/showPageMap.js"></script>
